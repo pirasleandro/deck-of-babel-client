@@ -1,13 +1,13 @@
 import type { Player } from './game-state';
 import type { HexColor, Id } from './util';
 
+export interface ItemDefinition {
+  id: Id<ItemDefinition>;
+}
+
 export interface Item {
   id: Id<Item>;
   definition: Id<ItemDefinition>;
-}
-
-export interface ItemDefinition {
-  id: Id<ItemDefinition>;
 }
 
 /**
@@ -23,29 +23,25 @@ export interface CardDefinition extends ItemDefinition {
 /** Currently, the contents of cards are just strings. */
 export type CardContents = string;
 
-export interface Draggable {
-  /** Normalized from 0 to 1 across the top of a board. */
-  x: number;
-  /** Proportional to x. */
-  y: number;
-}
-
 /**
  * An instance of a card in-game.
  */
 export interface Card extends Item {
   id: Id<Card>;
   definition: Id<CardDefinition>;
-  tokens: Map<Token, number>;
 }
 
+export type TokenContents = {
+  color: HexColor;
+  text: string;
+}
 /**
  * A token definition represents the definition of a token taken from a token bag.
  */
-export interface TokenType extends ItemDefinition {
-  id: Id<TokenType>;
+export interface TokenDefinition extends ItemDefinition {
+  id: Id<TokenDefinition>;
   /** Color of the token. */
-  color: HexColor;
+  contents: TokenContents;
 }
 
 /**
@@ -53,5 +49,5 @@ export interface TokenType extends ItemDefinition {
  */
 export interface Token extends Item {
   id: Id<Token>;
-  definition: Id<TokenType>;
+  definition: Id<TokenDefinition>;
 }

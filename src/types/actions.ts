@@ -1,5 +1,6 @@
-import type { Pile, Player, Visibility } from './game-state';
-import type { Card, CardContents, CardDefinition, Item } from './items';
+import { Container, Counter, Pile, Visibility } from './containers';
+import type { Player } from './game-state';
+import type { Card, CardContents, CardDefinition, Item, ItemDefinition, TokenContents, TokenDefinition } from './items';
 import type { Id } from './util';
 
 /**
@@ -32,62 +33,64 @@ export type EditUsernameAction = {
 // #endregion
 
 // #region [ITEM ACTIONS]
-// Sent by client when performing any actions on items or piles.
+// Sent by client when performing any actions on items or containers.
 
 /**
- * Takes the top N cards of the pile, placing them into your hand.
+ * Takes the top N items of the container, placing them into your held zone as the same type of container.
  * This is a convenient action for setup.
  */
-export type DrawCardsAction = {
-  type: 'drawCards';
+export type DrawItemsAction = {
+  type: 'draw-items';
   args: {
-    pile: Id<Pile<Card>>;
-    numCards: number;
+    container: Id<Container>;
+    number: number;
   };
 };
 
 /**
- * Removes a specific card from a pile, placing it into your held pile.
+ * Removes a specific item from a pile, placing it into your held zone as a pile.
  * It will fail if that specific card is no longer in the pile, or if the pile was shuffled more recently than this action.
+ * Note: this does not work for counters, since the items inside them are not unique.
+ * You can use Draw Items (number = 1) to take an item out of a counter.
  */
-export type GrabCardAction = {
-  type: 'grabCard';
+export type GrabItemAction = {
+  type: 'grab-item';
   args: {
-    pile: Id<Pile<Card>>;
-    index: Id<Card>;
+    pile: Id<Pile>;
+    item: Id<Item>;
   };
 };
 
 /**
- * Removes a pile from the board, placing it into your held pile.
+ * Removes a container from the board, placing it into your held zone.
  */
-export type GrabPileAction = {
-  type: 'grabPile';
+export type GrabContainerAction = {
+  type: 'grab-container';
   args: {
-    pile: Id<Pile<Item>>;
+    container: Id<Container>;
   };
 };
 
 /**
- * Drops your held pile into an existing pile at a certain index.
+ * Drops your held zone into an existing container at a certain index.
+ * Index is ignored when adding into a Counter.
+ * This action may fail in cases where it doesn't make sense to combine the two containers
+ * (for instance, if you try to drop multiple unique items into a counter,
+ * or if you try to drop a counter of unreasonable size into a pile.)
  */
 export type DropIntoAction = {
-  type: 'dropInto';
+  type: 'drop-into';
   args: {
-    pile: Id<Pile<Item>>;
+    container: Id<Container>;
     index: number;
-    dropFaceDown: boolean;
   };
 };
 
 /**
- * Drops your held pile onto the board as a new pile.
- * If the player grabbed an individual card, the default should be to turn it face up for all players if they could see it.
- * But if the player grabbed a full pile, the visibility should remain the same by default.
- * This is so that players can play cards from their hand face-up by default.
+ * Drops your held zone onto the board as a new container.
  */
 export type DropAtAction = {
-  type: 'dropAt';
+  type: 'drop-at';
   args: {
     board: Id<Player> | null;
     x: number;
@@ -97,67 +100,120 @@ export type DropAtAction = {
 };
 
 /**
- * Modifies a pile's visibility.
+ * Modifies a container's item visibility.
  */
-export type SetPileVisibilityAction = {
-  type: 'setPileVisibility';
+export type SetContainerVisibilityAction = {
+  type: 'set-container-visibility';
   args: {
-    pile: Id<Pile<Item>>;
+    container: Id<Container>;
     visibility: Visibility;
   };
 };
 
 /**
- * Creates a copy of an existing card definition.
- * The copy becomes held.
- * Note: you can probably do this either by going from the "custom card" screen,
- * or by right-clicking on an existing card.
+ * Modifies a counter's count visibility.
  */
-export type CreateCopyAction = {
-  type: 'createCopy';
+export type SetCounterCountVisibilityAction = {
+  type: 'set-counter-count-visibility';
   args: {
-    definition: Id<CardDefinition>;
-    isToken: boolean; // If it's a token, it won't be added to the deck list.
+    counter: Id<Counter>;
+    visibility: Visibility;
   };
 };
 
 /**
- * Creates a custom card.
+ * Modifies a counter's count by incrementing or decrementing it. (use a negative number to decrement)
  */
-export type CreateCustomCardAction = {
-  type: 'createCustomCard';
+export type IncrementCounterAction = {
+  type: 'increment-counter';
+  args: {
+    counter: Id<Counter>;
+    increment: number;
+  };
+};
+
+/**
+ * Modifies a counter's count by directly setting it.
+ */
+export type SetCounterAction = {
+  type: 'set-counter';
+  args: {
+    counter: Id<Counter>;
+    count: number;
+  };
+};
+
+/**
+ * Creates a (temporary) copy of an existing item. The copy becomes held.
+ * If a count is provided, create the item as a counter.
+ */
+export type CreateTemporaryCopyAction = {
+  type: 'create-temporary-copy';
+  args: {
+    definition: Id<ItemDefinition>;
+    count?: number;
+  };
+};
+
+/**
+ * Destroys the items you are holding.
+ */
+export type DestroyItemsAction = {
+  type: 'destroy-items';
+  args: {
+  };
+};
+
+/**
+ * Creates a custom card definition. This doesn't actually add a copy of it to the item pool, you should also change it's count.
+ */
+export type CreateCardDefinitionAction = {
+  type: 'create-card-definition';
   args: {
     contents: CardContents;
-    isToken: boolean; // If it's a token, it won't be added to the deck list.
   };
 };
 
 /**
- * Destroys a card, permanently removing it's copy from the card pool.
- * You should grab the card first before destroying it
- * On the frontend, you'd probably right-click and select a destroy option, which would give a confirmation message.
- * While you are responding to that confirmation message, the card is counted as held,
- * because otherwise, the time taken to confirm might make contention on that card's pile likely.
+ * Creates a custom token definition. This doesn't actually add a copy of it to the item pool, you should also change it's count.
  */
-export type DestroyCardAction = {
-  type: 'destroyCard';
+export type CreateTokenDefinitionAction = {
+  type: 'create-token-definition';
   args: {
-    pile: Id<Pile<Card>>;
-    index: number;
+    contents: TokenContents;
   };
 };
 
 /**
- * Modifies a specific copy of a card, creating a new definition forking from the original.
- * You should grab the card first before modifying it
- * On the frontend, you'd probably right-click and select a modify option, which would give an editing prompt.
- * While you are responding to that prompt, the card is counted as held,
- * because otherwise, the time taken to respond might make contention on that card's pile likely.
+ * Edits an existing card definition. This will change ALL items that use this definition.
  */
-export type ModifyCardAction = {
-  type: 'modifyCard';
+export type EditCardDefinitionAction = {
+  type: 'edit-card-definition';
   args: {
+    definition: Id<CardDefinition>,
     contents: CardContents;
+  };
+};
+
+/**
+ * Edits an existing token definition. This will change ALL items that use this definition.
+ */
+export type EditTokenDefinitionAction = {
+  type: 'edit-token-definition';
+  args: {
+    definition: Id<TokenDefinition>,
+    contents: TokenContents;
+  };
+};
+
+/**
+ * Changes the number of items of a certain type in the item pool. Use this to permanently add or remove copies of an item.
+ */
+export type ChangeItemPoolAction = {
+  type: 'change-item-pool';
+  args: {
+    definition: Id<ItemDefinition>;
+    increment: number;
   };
 };
 
@@ -165,30 +221,44 @@ export type ModifyCardAction = {
  * Shuffles a pile.
  */
 export type ShufflePileAction = {
-  type: 'shufflePile';
+  type: 'shuffle-pile';
   args: {
-    pile: Id<Pile<Item>>;
+    pile: Id<Pile>;
+  };
+};
+
+/**
+ * Converts a pile into a counter or vice versa, if possible.
+ */
+export type ConvertContainerAction = {
+  type: 'convert-container';
+  args: {
+    pile: Id<Container>;
   };
 };
 
 // #endregion
 
-/** Union type of all user actions */
-export type UserAction = RegisterUserAction | EditUsernameAction;
+export type RegisterAction =
+  RegisterUserAction |
+  EditUsernameAction
 
-/** Union type of all item actions */
-export type CardAction =
-  | DrawCardsAction
-  | GrabCardAction
-  | GrabPileAction
-  | DropIntoAction
-  | DropAtAction
-  | ShufflePileAction
-  | SetPileVisibilityAction
-  | CreateCopyAction
-  | CreateCustomCardAction
-  | DestroyCardAction
-  | ModifyCardAction
-  | EditUsernameAction;
-
-export type PileAction = ShufflePileAction;
+export type ItemAction =
+  DrawItemsAction |
+  GrabItemAction |
+  GrabContainerAction |
+  DropIntoAction |
+  DropAtAction |
+  SetContainerVisibilityAction |
+  SetCounterCountVisibilityAction |
+  IncrementCounterAction |
+  SetCounterAction |
+  CreateTemporaryCopyAction |
+  DestroyItemsAction |
+  CreateCardDefinitionAction |
+  CreateTokenDefinitionAction |
+  EditCardDefinitionAction |
+  EditTokenDefinitionAction |
+  ChangeItemPoolAction |
+  ShufflePileAction |
+  ConvertContainerAction
