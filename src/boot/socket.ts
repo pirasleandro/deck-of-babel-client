@@ -12,14 +12,19 @@ const URL = 'http://localhost:3000';
 const socket = io(URL, { autoConnect: true });
 
 socket.on('connect', () => {
-  console.log('[socket.ts] connected to socket');
+  console.log('[ws] connected to socket');
 });
 
 socket.on('disconnect', () => {
-  console.log('[socket.ts] disconnected from socket');
+  console.log('[ws] disconnected from socket');
+});
+
+socket.on('join-room', (room: string) => {
+  console.log('[ws] joined room', room);
 });
 
 export default defineBoot(({ app }) => {
+  socket.emit('ping', (response: string) => console.log('[ws] ping:', response));
   app.config.globalProperties.$socket = socket;
 });
 
