@@ -1,6 +1,13 @@
-import { Container, Counter, Pile, Visibility } from './containers';
+import type { Container, Counter, Pile, Visibility } from './containers';
 import type { Player } from './game-state';
-import type { Card, CardContents, CardDefinition, Item, ItemDefinition, TokenContents, TokenDefinition } from './items';
+import type {
+  CardContents,
+  CardDefinition,
+  Item,
+  ItemDefinition,
+  TokenContents,
+  TokenDefinition,
+} from './items';
 import type { Id } from './util';
 
 /**
@@ -14,9 +21,9 @@ export interface Action {
 // #region [USER ACTIONS]
 
 export type RegisterUserAction = {
-  type: 'registerUser';
+  type: 'register-user';
   args: {
-    name: string;
+    username: string;
   };
 };
 
@@ -24,7 +31,7 @@ export type RegisterUserAction = {
  * Edits the player's username.
  */
 export type EditUsernameAction = {
-  type: 'editUsername';
+  type: 'edit-username';
   args: {
     username: string;
   };
@@ -160,8 +167,7 @@ export type CreateTemporaryCopyAction = {
  */
 export type DestroyItemsAction = {
   type: 'destroy-items';
-  args: {
-  };
+  args: never;
 };
 
 /**
@@ -190,7 +196,7 @@ export type CreateTokenDefinitionAction = {
 export type EditCardDefinitionAction = {
   type: 'edit-card-definition';
   args: {
-    definition: Id<CardDefinition>,
+    definition: Id<CardDefinition>;
     contents: CardContents;
   };
 };
@@ -201,7 +207,7 @@ export type EditCardDefinitionAction = {
 export type EditTokenDefinitionAction = {
   type: 'edit-token-definition';
   args: {
-    definition: Id<TokenDefinition>,
+    definition: Id<TokenDefinition>;
     contents: TokenContents;
   };
 };
@@ -239,26 +245,24 @@ export type ConvertContainerAction = {
 
 // #endregion
 
-export type RegisterAction =
-  RegisterUserAction |
-  EditUsernameAction
+export type RegisterAction = RegisterUserAction | EditUsernameAction;
 
 export type ItemAction =
-  DrawItemsAction |
-  GrabItemAction |
-  GrabContainerAction |
-  DropIntoAction |
-  DropAtAction |
-  SetContainerVisibilityAction |
-  SetCounterCountVisibilityAction |
-  IncrementCounterAction |
-  SetCounterAction |
-  CreateTemporaryCopyAction |
-  DestroyItemsAction |
-  CreateCardDefinitionAction |
-  CreateTokenDefinitionAction |
-  EditCardDefinitionAction |
-  EditTokenDefinitionAction |
-  ChangeItemPoolAction |
-  ShufflePileAction |
-  ConvertContainerAction
+  | DrawItemsAction
+  | GrabItemAction
+  | GrabContainerAction
+  | DropIntoAction
+  | DropAtAction
+  | SetContainerVisibilityAction
+  | SetCounterCountVisibilityAction
+  | IncrementCounterAction
+  | SetCounterAction
+  | CreateTemporaryCopyAction
+  | DestroyItemsAction
+  | CreateCardDefinitionAction
+  | CreateTokenDefinitionAction
+  | EditCardDefinitionAction
+  | EditTokenDefinitionAction
+  | ChangeItemPoolAction
+  | ShufflePileAction
+  | ConvertContainerAction;

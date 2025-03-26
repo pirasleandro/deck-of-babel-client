@@ -1,7 +1,7 @@
 import type { Socket } from 'socket.io-client';
-import type { Item, ItemDefinition, Card, CardDefinition, TokenDefinition } from './items';
-import type { Id, Timestamp } from './util';
-import { Container, Pile } from './containers';
+import type { ItemDefinition } from './items';
+import type { Id } from './util';
+import type { Container, Pile } from './containers';
 
 export interface GameState {
   /**
@@ -19,7 +19,7 @@ export interface GameState {
   playerBoards: Map<Id<Player>, Board>;
   /** All players in the game. */
   players: Player[];
-} 
+}
 
 export interface Player {
   /** The player's id. */
