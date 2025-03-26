@@ -19,8 +19,15 @@ export type Id<_Annotation> = number;
 export type HexColor = `#${string}`;
 
 export interface Position {
-    /** Normalized from 0 to 1 across the top of a board. */
-    x: number;
-    /** Proportional to x. */
-    y: number;
-  }
+  /** Normalized from 0 to 1 across the top of a board. */
+  x: number;
+  /** Proportional to x. */
+  y: number;
+}
+
+export interface Offset {
+  /** Offset from the left. */
+  left: number;
+  /** Offset from the top. */
+  top: number;
+}
