@@ -31,7 +31,7 @@ const definition = computed(() => props.card?.definition ? (game.definitions.get
           name: 'clone',
           label: 'Clone',
           icon: 'sym_r_content_copy',
-          handler: () => card?.definition ? socket.action({ type: 'create-temporary-copy', args: { definition: card?.definition } }) : undefined,
+          handler: () => card?.definition ? socket.action('create-temporary-copy', { definition: card?.definition }) : undefined,
         },
         {
           name: 'cloneAndAddToPool',

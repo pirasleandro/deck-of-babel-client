@@ -2,10 +2,6 @@
 import { ref } from 'vue';
 import { socket } from 'boot/socket';
 import { useCursorStore } from 'src/stores/cursor';
-import { vDraggable } from 'src/directives/draggable';
-
-import ItemPile from 'src/components/ItemPile.vue';
-import PlayingCard from 'src/components/PlayingCard.vue';
 
 const cursor = useCursorStore();
 
@@ -38,16 +34,5 @@ function joinGame() {
         <q-btn label="Create" @click="createGame()" />
       </template>
     </q-input>
-    <ItemPile v-draggable="{ x: 100, y: 100 }">
-      <PlayingCard v-draggable class="position-relative" />
-      <PlayingCard v-draggable class="position-relative" />
-      <PlayingCard v-draggable class="position-relative" />
-      <PlayingCard v-draggable class="position-relative" />
-      <PlayingCard v-draggable class="position-relative" />
-      <PlayingCard v-draggable class="position-relative" />
-    </ItemPile>
-    <q-page-sticky>
-      <q-fab icon="sym_r_add" active-icon="sym_r_close"></q-fab>
-    </q-page-sticky>
   </q-page>
 </template>
