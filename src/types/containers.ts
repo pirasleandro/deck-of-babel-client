@@ -7,7 +7,7 @@ export type Visibility =
   | {
       /** Only a certain set of players may access this object. */
       type: 'hidden';
-      player: Set<Id<Player>>;
+      players: Set<Id<Player>>;
     }
   | {
       /** All players may can access this object.  */

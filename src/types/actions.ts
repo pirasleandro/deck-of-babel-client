@@ -20,22 +20,22 @@ export interface Action {
 
 // #region [USER ACTIONS]
 
-export type RegisterUserAction = {
+interface RegisterUserAction extends Action {
   type: 'register-user';
   args: {
     username: string;
   };
-};
+}
 
 /**
  * Edits the player's username.
  */
-export type EditUsernameAction = {
+interface EditUsernameAction extends Action {
   type: 'edit-username';
   args: {
     username: string;
   };
-};
+}
 
 // #endregion
 
@@ -46,13 +46,13 @@ export type EditUsernameAction = {
  * Takes the top N items of the container, placing them into your held zone as the same type of container.
  * This is a convenient action for setup.
  */
-export type DrawItemsAction = {
+interface DrawItemsAction extends Action {
   type: 'draw-items';
   args: {
     container: Id<Container>;
     number: number;
   };
-};
+}
 
 /**
  * Removes a specific item from a pile, placing it into your held zone as a pile.
@@ -60,23 +60,23 @@ export type DrawItemsAction = {
  * Note: this does not work for counters, since the items inside them are not unique.
  * You can use Draw Items (number = 1) to take an item out of a counter.
  */
-export type GrabItemAction = {
+interface GrabItemAction extends Action {
   type: 'grab-item';
   args: {
     pile: Id<Pile>;
     item: Id<Item>;
   };
-};
+}
 
 /**
  * Removes a container from the board, placing it into your held zone.
  */
-export type GrabContainerAction = {
+interface GrabContainerAction extends Action {
   type: 'grab-container';
   args: {
     container: Id<Container>;
   };
-};
+}
 
 /**
  * Drops your held zone into an existing container at a certain index.
@@ -85,18 +85,18 @@ export type GrabContainerAction = {
  * (for instance, if you try to drop multiple unique items into a counter,
  * or if you try to drop a counter of unreasonable size into a pile.)
  */
-export type DropIntoAction = {
+interface DropIntoAction extends Action {
   type: 'drop-into';
   args: {
     container: Id<Container>;
     index: number;
   };
-};
+}
 
 /**
  * Drops your held zone onto the board as a new container.
  */
-export type DropAtAction = {
+interface DropAtAction extends Action {
   type: 'drop-at';
   args: {
     board: Id<Player> | null;
@@ -104,144 +104,144 @@ export type DropAtAction = {
     y: number;
     visibility: Visibility;
   };
-};
+}
 
 /**
  * Modifies a container's item visibility.
  */
-export type SetContainerVisibilityAction = {
+interface SetContainerVisibilityAction extends Action {
   type: 'set-container-visibility';
   args: {
     container: Id<Container>;
     visibility: Visibility;
   };
-};
+}
 
 /**
  * Modifies a counter's count visibility.
  */
-export type SetCounterCountVisibilityAction = {
+interface SetCounterCountVisibilityAction extends Action {
   type: 'set-counter-count-visibility';
   args: {
     counter: Id<Counter>;
     visibility: Visibility;
   };
-};
+}
 
 /**
  * Modifies a counter's count by incrementing or decrementing it. (use a negative number to decrement)
  */
-export type IncrementCounterAction = {
+interface IncrementCounterAction extends Action {
   type: 'increment-counter';
   args: {
     counter: Id<Counter>;
     increment: number;
   };
-};
+}
 
 /**
  * Modifies a counter's count by directly setting it.
  */
-export type SetCounterAction = {
+interface SetCounterAction extends Action {
   type: 'set-counter';
   args: {
     counter: Id<Counter>;
     count: number;
   };
-};
+}
 
 /**
  * Creates a (temporary) copy of an existing item. The copy becomes held.
  * If a count is provided, create the item as a counter.
  */
-export type CreateTemporaryCopyAction = {
+interface CreateTemporaryCopyAction extends Action {
   type: 'create-temporary-copy';
   args: {
     definition: Id<ItemDefinition>;
     count?: number;
   };
-};
+}
 
 /**
  * Destroys the items you are holding.
  */
-export type DestroyItemsAction = {
+interface DestroyItemsAction extends Action {
   type: 'destroy-items';
   args: never;
-};
+}
 
 /**
  * Creates a custom card definition. This doesn't actually add a copy of it to the item pool, you should also change it's count.
  */
-export type CreateCardDefinitionAction = {
+interface CreateCardDefinitionAction extends Action {
   type: 'create-card-definition';
   args: {
     contents: CardContents;
   };
-};
+}
 
 /**
  * Creates a custom token definition. This doesn't actually add a copy of it to the item pool, you should also change it's count.
  */
-export type CreateTokenDefinitionAction = {
+interface CreateTokenDefinitionAction extends Action {
   type: 'create-token-definition';
   args: {
     contents: TokenContents;
   };
-};
+}
 
 /**
  * Edits an existing card definition. This will change ALL items that use this definition.
  */
-export type EditCardDefinitionAction = {
+interface EditCardDefinitionAction extends Action {
   type: 'edit-card-definition';
   args: {
     definition: Id<CardDefinition>;
     contents: CardContents;
   };
-};
+}
 
 /**
  * Edits an existing token definition. This will change ALL items that use this definition.
  */
-export type EditTokenDefinitionAction = {
+interface EditTokenDefinitionAction extends Action {
   type: 'edit-token-definition';
   args: {
     definition: Id<TokenDefinition>;
     contents: TokenContents;
   };
-};
+}
 
 /**
  * Changes the number of items of a certain type in the item pool. Use this to permanently add or remove copies of an item.
  */
-export type ChangeItemPoolAction = {
+interface ChangeItemPoolAction extends Action {
   type: 'change-item-pool';
   args: {
     definition: Id<ItemDefinition>;
     increment: number;
   };
-};
+}
 
 /**
  * Shuffles a pile.
  */
-export type ShufflePileAction = {
+interface ShufflePileAction extends Action {
   type: 'shuffle-pile';
   args: {
     pile: Id<Pile>;
   };
-};
+}
 
 /**
  * Converts a pile into a counter or vice versa, if possible.
  */
-export type ConvertContainerAction = {
+interface ConvertContainerAction extends Action {
   type: 'convert-container';
   args: {
     pile: Id<Container>;
   };
-};
+}
 
 // #endregion
 
